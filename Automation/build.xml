@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="runTests" name="Tracking (Lemuriah)">
+	<!-- ========== Initialize Properties =================================== -->
+		
+	    <property name="build.dir" value="${basedir}/build"/>
+	    <property name="lib.dir" value="${basedir}/lib"/>
+	    <property name="src.dir" value="${basedir}/src"/>
+	    <property name="browser" value="/usr/bin/firefox"/>
+		
+	    <target name="setClassPath">
+	        <path id="classpath_jars">
+	            <pathelement path="${basedir}/" />
+	            <fileset dir="${lib.dir}" includes="*.jar" />
+	        </path>
+	        <pathconvert pathsep=":" property="test.classpath" refid="classpath_jars" />
+	    </target>
+		
+	    <target name="loadTestNG" depends="setClassPath">
+	        <taskdef resource="testngtasks" classpath="${test.classpath}"/>
+	    </target>
+		
+		<!-- init -->
+		
+	    <target name="init">
+	        <mkdir dir="${build.dir}"/>
+	        <tstamp>
+	            <format property="timestamp" pattern="dd-MM-yyyy_(HH-mm-ss)"/>
+	        </tstamp>
+	        <property name="build.log.dir" location="${basedir}/buildlogs"/>
+	        <mkdir dir="${build.log.dir}"/>
+	        <property name="build.log.filename" value="build_${timestamp}.log"/>
+	        <record name="${build.log.dir}/${build.log.filename}" loglevel="verbose" append="false"/>
+	        <echo message="build logged to ${build.log.filename}"/>
+	    </target>
+		
+		<!-- clean -->
+		
+	    <target name="clean">
+	        <echo message="deleting existing build directory"/>
+	        <delete dir="${build.dir}"/>
+	    </target>
+		
+		<!-- compile -->
+		
+	    <target name="compile" depends="clean,init,setClassPath,loadTestNG">
+	    <!--    <echo message="classpath:${test.classpath}"/>-->
+	        <echo message="compiling.........."/>
+	        <javac destdir="${build.dir}" srcdir="${src.dir}" classpath="${test.classpath}"/>
+	    </target>
+		
+		<!-- run -->
+		
+	    <target name="runTests" depends="compile">
+	        <testng classpath="${test.classpath}:${build.dir}">
+	            <xmlfileset dir="${basedir}" includes="testng.xml" />
+	        </testng>
+	    </target>
+</project>
